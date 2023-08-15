@@ -1,15 +1,15 @@
 # vault-benchmarks
 
-This repo holds the code to deploy, run and evaluate (vault-benchmark)[https://github.com/hashicorp/vault-benchmark/] on AKS, GKE and (Constellation)[https://github.com/edgelesssys/constellation].
+This repo holds the code to deploy, run and evaluate [vault-benchmark](https://github.com/hashicorp/vault-benchmark/) on AKS, GKE and [Constellation](https://github.com/edgelesssys/constellation).
 It also holds the raw data of 100 runs of vault-benchmark against AKS, GKE and Constellation.
 
 # Benchmark Setup
 
 We run a Vault cluster with two nodes, each scheduled on a separate VM.
 One primary and one read-replica.
-Vault only (scales vertically)[https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#performance-standbys], if not using the enterprise edition.
+Vault only [scales vertically](https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#performance-standbys), if not using the enterprise edition.
 A third VM runs the load generator (vault-benchmark).
-In many scenarios Vault's performance is (I/O bound)[https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#a-note-about-cpu-scaling].
+In many scenarios Vault's performance is [I/O bound](https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#a-note-about-cpu-scaling).
 
 # Deploy
 - Start your target cluster:
