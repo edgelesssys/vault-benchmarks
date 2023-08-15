@@ -50,15 +50,15 @@ P99: mean: 7.518989, variance: 4.830565
 Max: mean: 8.161877, variance: 3.909015
 Min: mean: 0.011946, variance: 0.000225
 ========== AKS vs C11n ==========
-Mean: +6.371342 %
-P99: -9.273208 %
-Max: -7.965180 %
-Min: +18.178964 %
+Mean: +6.371342 % (lower is better)
+P99: -9.273208 % (lower is better)
+Max: -7.965180 % (lower is better)
+Min: +18.178964 % (lower is better)
 ========== GKE vs C11n ==========
-Mean: +6.163156 %
-P99: -6.057404 %
-Max: -5.533651 %
-Min: +28.767820 %
+Mean: +6.163156 % (lower is better)
+P99: -6.057404 % (lower is better)
+Max: -5.533651 % (lower is better)
+Min: +28.767820 % (lower is better)
 ```
 
 The above results are from 100 runs, 1300 workers, 1 job, 10 seconds per run.
