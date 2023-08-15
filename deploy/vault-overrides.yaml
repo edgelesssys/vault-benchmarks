@@ -1,0 +1,123 @@
+
+# Vault Helm Chart Value Overrides
+global:
+  enabled: true
+  tlsDisable: false
+
+injector:
+  enabled: true
+  # Use the Vault K8s Image https://github.com/hashicorp/vault-k8s/
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "1.2.1"
+
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 250m
+      limits:
+        memory: 256Mi
+        cpu: 250m
+
+server:
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.14.1"
+
+  # These Resource Limits are in line with node requirements in the
+  # Vault Reference Architecture for a Small Cluster
+  resources:
+    requests:
+      memory: 8Gi
+      cpu: 2000m
+    limits:
+      memory: 16Gi
+      cpu: 2000m
+
+  # For HA configuration and because we need to manually init the vault,
+  # we need to define custom readiness/liveness Probe settings
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+  livenessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
+
+  # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
+  # used to include variables required for auto-unseal.
+  extraEnvironmentVars:
+    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Vault in the path `/vault/userconfig/<name>/`.
+  extraVolumes:
+    - type: secret
+      name: vault-server-tls
+
+  # This configures the Vault Statefulset to create a PVC for audit logs.
+  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  auditStorage:
+    enabled: true
+
+  dataStorage:
+    enabled: true
+
+  affinity: |
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - gitlab-bench-ac7fe507-worker-53444267000000
+            - gitlab-bench-ac7fe507-worker-53444267000001
+            - aks-nodepool1-67285293-vmss00000c
+            - aks-nodepool1-67285293-vmss00000d
+            - gke-vault-benchmark-default-pool-3bbd1e54-1ttd
+            - gke-vault-benchmark-default-pool-3bbd1e54-jxlz
+
+  # Run Vault in "HA" mode.
+  ha:
+    enabled: true
+    replicas: 2
+    raft:
+      enabled: true
+      setNodeId: true
+
+      config: |
+        ui = true
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+          tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+          tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+          retry_join {
+            leader_api_addr = "https://vault-0.vault-internal:8200"
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+          }
+          retry_join {
+            leader_api_addr = "https://vault-1.vault-internal:8200"
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+          }
+        }
+
+        service_registration "kubernetes" {}
+
+# Vault UI
+ui:
+  enabled: false
+  serviceType: "LoadBalancer"
+  serviceNodePort: null
+  externalPort: 8200
+
+  # For Added Security, edit the below
+  #loadBalancerSourceRanges:
+  #   - < Your IP RANGE Ex. 10.0.0.0/16 >
+  #   - < YOUR SINGLE IP Ex. 1.78.23.3/32 >

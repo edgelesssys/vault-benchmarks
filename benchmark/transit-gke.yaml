@@ -1,0 +1,108 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-benchmark
+  namespace: vault
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: benchmark-output
+  namespace: vault
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-benchmark-configmap
+  namespace: vault
+data:
+  k8s.hcl: |
+    # Basic Benchmark config options
+    vault_addr = "https://vault.vault:8200"
+    vault_token = "replaceme_vault_token"
+    duration = "10s"
+    report_mode = "json"
+    random_mounts = true
+    cleanup = true
+    log_level = "WARN"
+    workers = 1300
+
+    test "transit_sign" "transit_sign_test_1" {
+      weight = 25
+    }
+
+    test "transit_verify" "transit_verify_test_1" {
+      weight = 25
+      config {
+        verify {
+          signature_algorithm = "pkcs1v15"
+        }
+      }
+    }
+
+    test "transit_encrypt" "transit_encrypt_test_1" {
+      weight = 25
+    }
+
+    test "transit_decrypt" "transit_decrypt_test_1" {
+      weight = 25
+      config {
+        payload_len = 64
+      }
+    }
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-benchmark
+  namespace: vault
+spec:
+  parallelism: 1
+  backoffLimit: 0
+  template:
+    metadata:
+      name: vault-benchmark
+      labels:
+        app: vault-benchmark
+    spec:
+      containers:
+      - name: vault-benchmark
+        image: hashicorp/vault-benchmark:latest
+        imagePullPolicy: IfNotPresent
+        command: ["vault-benchmark"]
+        args: [
+          "run",
+          "-ca_pem_file=/vault/userconfig/vault-server-tls/vault.ca",
+          "-config=/config/k8s.hcl",
+        ]
+        volumeMounts:
+        - name: benchmark-config
+          mountPath: "/config"
+          readOnly: true
+        - name: vault-server-tls
+          mountPath: "/vault/userconfig/vault-server-tls"
+          readOnly: true
+      restartPolicy: Never
+      serviceAccountName: vault-benchmark
+      volumes:
+      - name: benchmark-config
+        configMap:
+          name: vault-benchmark-configmap
+      - name: vault-server-tls
+        secret:
+          secretName: vault-server-tls
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - replaceme_node_name
