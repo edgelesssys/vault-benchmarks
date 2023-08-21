@@ -12,7 +12,7 @@ fi
 
 
 function converge() {
-    datadir=./data/1300w/$2
+    datadir=./data/1300w/5replicas/$2
     mkdir -p $datadir
     KUBECONFIG=./kubecfg-$2.yaml
 

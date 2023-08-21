@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	AKS_DATA    = "../data/1300w/aks"
-	GKE_DATA    = "../data/1300w/gke"
-	C11N_DATA   = "../data/1300w/c11n"
+	AKS_DATA    = "../data/1300w/5replicas/aks"
+	GKE_DATA    = "../data/1300w/5replicas/gke"
+	C11N_DATA   = "../data/1300w/5replicas/c11n"
 	PLOT_PREFIX = "boxplots"
 )
 

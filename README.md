@@ -32,7 +32,7 @@ In many scenarios Vault's performance is [I/O bound](https://developer.hashicorp
 
 To calculate some basic statistics from the data in this repo and regenerate the boxplots cd into `vegeta-parser` and run: `go run .`.
 
-You will be presented with results like these:
+Results 2 replicas, 100 runs, 1300 workers, 1 job, 10 seconds per run.:
 ```
 ========== Results AKS ==========
 Mean: mean: 1.729962, variance: 0.194084
@@ -61,4 +61,31 @@ Max: -5.533651 % (lower is better)
 Min: +28.767820 % (lower is better)
 ```
 
-The above results are from 100 runs, 1300 workers, 1 job, 10 seconds per run.
+Results 5 replicas, 100 runs, 1300 workers, 1 job, 10 seconds per run.:
+```
+========== Results AKS ==========
+Mean: mean: 1.632200, variance: 0.002057
+P99: mean: 5.480679, variance: 2.263700
+Max: mean: 6.651001, variance: 2.808401
+Min: mean: 0.011415, variance: 0.000133
+========== Results GKE ==========
+Mean: mean: 1.656435, variance: 0.003615
+P99: mean: 6.030807, variance: 3.955051
+Max: mean: 7.164843, variance: 3.300004
+Min: mean: 0.010233, variance: 0.000111
+========== Results C11n ==========
+Mean: mean: 1.651549, variance: 0.001610
+P99: mean: 5.780422, variance: 3.016106
+Max: mean: 6.942997, variance: 3.075796
+Min: mean: 0.013774, variance: 0.000228
+========== AKS vs C11n ==========
+Mean: +1.171577 %
+P99: +5.185495 %
+Max: +4.205618 %
+Min: +17.128781 %
+========== GKE vs C11n ==========
+Mean: -0.295851 %
+P99: -4.331603 %
+Max: -3.195248 %
+Min: +25.710886 %
+```

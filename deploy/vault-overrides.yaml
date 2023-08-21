@@ -71,17 +71,26 @@ server:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - gitlab-bench-ac7fe507-worker-53444267000000
-            - gitlab-bench-ac7fe507-worker-53444267000001
-            - aks-nodepool1-67285293-vmss00000c
-            - aks-nodepool1-67285293-vmss00000d
-            - gke-vault-benchmark-default-pool-3bbd1e54-1ttd
-            - gke-vault-benchmark-default-pool-3bbd1e54-jxlz
+            - gitlab-bench-1a801930-worker-8751aa35000000
+            - gitlab-bench-1a801930-worker-8751aa35000001
+            - gitlab-bench-1a801930-worker-8751aa35000002
+            - gitlab-bench-1a801930-worker-8751aa35000003
+            - gitlab-bench-1a801930-worker-8751aa35000004
+            - aks-nodepool1-34876310-vmss000000
+            - aks-nodepool1-34876310-vmss000001
+            - aks-nodepool1-34876310-vmss000002
+            - aks-nodepool1-34876310-vmss000003
+            - aks-nodepool1-34876310-vmss000004
+            - gke-vault-benchmark-default-pool-588c66fc-49pd
+            - gke-vault-benchmark-default-pool-588c66fc-54lf
+            - gke-vault-benchmark-default-pool-588c66fc-9sff
+            - gke-vault-benchmark-default-pool-588c66fc-cw4w
+            - gke-vault-benchmark-default-pool-588c66fc-qrxs
 
   # Run Vault in "HA" mode.
   ha:
     enabled: true
-    replicas: 2
+    replicas: 5
     raft:
       enabled: true
       setNodeId: true
