@@ -3,13 +3,23 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"os"
 
+	"golang.org/x/image/font/opentype"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
 )
 
 func plotData(dataA, dataB, dataC []float64, title, filename string) error {
+	openSans, err := getOpenSansFont()
+	if err != nil {
+		return fmt.Errorf("Could not get Open Sans font: %v", err)
+	}
+	plot.DefaultFont = openSans
+	plotter.DefaultFont = openSans
+
 	p := plot.New()
 
 	p.Title.Text = title
@@ -73,4 +83,29 @@ func equallySpacedValues(min, max float64, numValues int) []float64 {
 	}
 
 	return values
+}
+
+func getOpenSansFont() (font.Font, error) {
+	// File taken from: "https://github.com/googlefonts/opensans/raw/main/fonts/ttf/OpenSans-Regular.ttf"
+	ttf, err := os.ReadFile("OpenSans-Regular.ttf")
+	if err != nil {
+		return font.Font{}, fmt.Errorf("Could not read font file: %v", err)
+	}
+
+	fontTTF, err := opentype.Parse(ttf)
+	if err != nil {
+		return font.Font{}, fmt.Errorf("Could not parse font: %v", err)
+	}
+	openSans := font.Font{Typeface: "OpenSans"}
+	font.DefaultCache.Add([]font.Face{
+		{
+			Font: openSans,
+			Face: fontTTF,
+		},
+	})
+	if !font.DefaultCache.Has(openSans) {
+		return font.Font{}, fmt.Errorf("no font %q!", openSans.Typeface)
+	}
+
+	return openSans, nil
 }

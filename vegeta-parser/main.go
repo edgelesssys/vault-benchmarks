@@ -68,16 +68,16 @@ func run() error {
 	fmt.Println("========== GKE vs C11n ==========")
 	fmt.Print(getDifference(gkeRun, c11nRun))
 
-	if err := plotData(aksRun.MeanRaw, gkeRun.MeanRaw, c11nRun.MeanRaw, "Mean", "mean"); err != nil {
+	if err := plotData(aksRun.MeanRaw, gkeRun.MeanRaw, c11nRun.MeanRaw, "Mean", "mean_latency"); err != nil {
 		return fmt.Errorf("plotting mean: %w", err)
 	}
-	if err := plotData(aksRun.P99Raw, gkeRun.P99Raw, c11nRun.P99Raw, "99th Percentile", "p99"); err != nil {
+	if err := plotData(aksRun.P99Raw, gkeRun.P99Raw, c11nRun.P99Raw, "99th Percentile", "p99_latency"); err != nil {
 		return fmt.Errorf("plotting p99: %w", err)
 	}
-	if err := plotData(aksRun.MaxRaw, gkeRun.MaxRaw, c11nRun.MaxRaw, "Maximum", "max"); err != nil {
+	if err := plotData(aksRun.MaxRaw, gkeRun.MaxRaw, c11nRun.MaxRaw, "Maximum", "max_latency"); err != nil {
 		return fmt.Errorf("plotting max: %w", err)
 	}
-	if err := plotData(aksRun.MinRaw, gkeRun.MinRaw, c11nRun.MinRaw, "Minimum", "min"); err != nil {
+	if err := plotData(aksRun.MinRaw, gkeRun.MinRaw, c11nRun.MinRaw, "Minimum", "min_latency"); err != nil {
 		return fmt.Errorf("plotting min: %w", err)
 	}
 
@@ -91,10 +91,10 @@ func getDifference(a, b runStats) string {
 	minDiff := (1 - (a.Min.Mean / b.Min.Mean)) * 100
 
 	builder := strings.Builder{}
-	builder.WriteString(fmt.Sprintf("Mean: %s %%\n", writeSignedPercentage(meanDiff)))
-	builder.WriteString(fmt.Sprintf("P99: %s %%\n", writeSignedPercentage(p99Diff)))
-	builder.WriteString(fmt.Sprintf("Max: %s %%\n", writeSignedPercentage(maxDiff)))
-	builder.WriteString(fmt.Sprintf("Min: %s %%\n", writeSignedPercentage(minDiff)))
+	builder.WriteString(fmt.Sprintf("Mean:\t%s %%\n", writeSignedPercentage(meanDiff)))
+	builder.WriteString(fmt.Sprintf("P99:\t%s %%\n", writeSignedPercentage(p99Diff)))
+	builder.WriteString(fmt.Sprintf("Max:\t%s %%\n", writeSignedPercentage(maxDiff)))
+	builder.WriteString(fmt.Sprintf("Min:\t%s %%\n", writeSignedPercentage(minDiff)))
 
 	return builder.String()
 }
@@ -184,7 +184,7 @@ type runStats struct {
 }
 
 func (r runStats) String() string {
-	return fmt.Sprintf("Mean: %s\nP99: %s\nMax: %s\nMin: %s", r.Mean, r.P99, r.Max, r.Min)
+	return fmt.Sprintf("Mean:\t%s\nP99:\t%s\nMax:\t%s\nMin:\t%s", r.Mean, r.P99, r.Max, r.Min)
 }
 
 // statContainer holds different measures for a single data dimension.
