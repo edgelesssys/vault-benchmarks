@@ -1,14 +1,14 @@
 # vault-benchmarks
 
 This repo holds the code to deploy, run and evaluate [vault-benchmark](https://github.com/hashicorp/vault-benchmark/) on AKS, GKE and [Constellation](https://github.com/edgelesssys/constellation).
-It also holds the raw data of 100 runs of vault-benchmark against AKS, GKE and Constellation.
+It also holds the raw data of various runs of vault-benchmark against AKS, GKE and Constellation.
 
 # Benchmark Setup
 
-We run a Vault cluster with two nodes, each scheduled on a separate VM.
-One primary and one read-replica.
+We run a Vault cluster with n nodes, each scheduled on a separate VM.
+One primary and n-1 read-replica.
 Vault only [scales vertically](https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#performance-standbys), if not using the enterprise edition.
-A third VM runs the load generator (vault-benchmark).
+A separate VM (n+1 th) runs the load generator (vault-benchmark).
 In many scenarios Vault's performance is [I/O bound](https://developer.hashicorp.com/vault/tutorials/operations/performance-tuning#a-note-about-cpu-scaling).
 
 # Deploy
@@ -30,62 +30,64 @@ In many scenarios Vault's performance is [I/O bound](https://developer.hashicorp
 
 # Evaluation
 
-To calculate some basic statistics from the data in this repo and regenerate the boxplots cd into `vegeta-parser` and run: `go run .`.
+To calculate basic statistics from the data in this repo and regenerate the boxplots run: `cd vegeta-parser && go run .`.
 
 Results 2 replicas, 100 runs, 1300 workers, 1 job, 10 seconds per run.:
 ```
 ========== Results AKS ==========
-Mean: mean: 1.729962, variance: 0.194084
-P99: mean: 8.216240, variance: 4.842087
-Max: mean: 8.811985, variance: 4.267199
-Min: mean: 0.009774, variance: 0.000169
+Mean:   mean: 1.729962, variance: 0.194084
+P99:    mean: 8.216240, variance: 4.842087
+Max:    mean: 8.811985, variance: 4.267199
+Min:    mean: 0.009774, variance: 0.000169
 ========== Results GKE ==========
-Mean: mean: 1.733809, variance: 0.196227
-P99: mean: 7.974444, variance: 5.930670
-Max: mean: 8.613526, variance: 4.831148
-Min: mean: 0.008509, variance: 0.000121
+Mean:   mean: 1.733809, variance: 0.196227
+P99:    mean: 7.974444, variance: 5.930670
+Max:    mean: 8.613526, variance: 4.831148
+Min:    mean: 0.008509, variance: 0.000121
 ========== Results C11n ==========
-Mean: mean: 1.847684, variance: 0.198169
-P99: mean: 7.518989, variance: 4.830565
-Max: mean: 8.161877, variance: 3.909015
-Min: mean: 0.011946, variance: 0.000225
+Mean:   mean: 1.847684, variance: 0.198169
+P99:    mean: 7.518989, variance: 4.830565
+Max:    mean: 8.161877, variance: 3.909015
+Min:    mean: 0.011946, variance: 0.000225
 ========== AKS vs C11n ==========
-Mean: +6.371342 % (lower is better)
-P99: -9.273208 % (lower is better)
-Max: -7.965180 % (lower is better)
-Min: +18.178964 % (lower is better)
+Mean:   +6.371342 % (lower is better)
+P99:    -9.273208 % (lower is better)
+Max:    -7.965180 % (lower is better)
+Min:    +18.178964 % (lower is better)
 ========== GKE vs C11n ==========
-Mean: +6.163156 % (lower is better)
-P99: -6.057404 % (lower is better)
-Max: -5.533651 % (lower is better)
-Min: +28.767820 % (lower is better)
+Mean:   +6.163156 % (lower is better)
+P99:    -6.057404 % (lower is better)
+Max:    -5.533651 % (lower is better)
+Min:    +28.767820 % (lower is better)
 ```
 
 Results 5 replicas, 100 runs, 1300 workers, 1 job, 10 seconds per run.:
 ```
 ========== Results AKS ==========
-Mean: mean: 1.632200, variance: 0.002057
-P99: mean: 5.480679, variance: 2.263700
-Max: mean: 6.651001, variance: 2.808401
-Min: mean: 0.011415, variance: 0.000133
+Mean:   mean: 1.632200, variance: 0.002057
+P99:    mean: 5.480679, variance: 2.263700
+Max:    mean: 6.651001, variance: 2.808401
+Min:    mean: 0.011415, variance: 0.000133
 ========== Results GKE ==========
-Mean: mean: 1.656435, variance: 0.003615
-P99: mean: 6.030807, variance: 3.955051
-Max: mean: 7.164843, variance: 3.300004
-Min: mean: 0.010233, variance: 0.000111
+Mean:   mean: 1.656435, variance: 0.003615
+P99:    mean: 6.030807, variance: 3.955051
+Max:    mean: 7.164843, variance: 3.300004
+Min:    mean: 0.010233, variance: 0.000111
 ========== Results C11n ==========
-Mean: mean: 1.651549, variance: 0.001610
-P99: mean: 5.780422, variance: 3.016106
-Max: mean: 6.942997, variance: 3.075796
-Min: mean: 0.013774, variance: 0.000228
+Mean:   mean: 1.651549, variance: 0.001610
+P99:    mean: 5.780422, variance: 3.016106
+Max:    mean: 6.942997, variance: 3.075796
+Min:    mean: 0.013774, variance: 0.000228
 ========== AKS vs C11n ==========
-Mean: +1.171577 %
-P99: +5.185495 %
-Max: +4.205618 %
-Min: +17.128781 %
+Mean:   +1.171577 %
+P99:    +5.185495 %
+Max:    +4.205618 %
+Min:    +17.128781 %
 ========== GKE vs C11n ==========
-Mean: -0.295851 %
-P99: -4.331603 %
-Max: -3.195248 %
-Min: +25.710886 %
+Mean:   -0.295851 %
+P99:    -4.331603 %
+Max:    -3.195248 %
+Min:    +25.710886 %
 ```
+
+Please see the [Constellation documentation](TODO) for an explanation of the results.
