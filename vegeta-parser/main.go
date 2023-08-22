@@ -15,7 +15,7 @@ const (
 	AKS_DATA    = "../data/1300w/5replicas/aks"
 	GKE_DATA    = "../data/1300w/5replicas/gke"
 	C11N_DATA   = "../data/1300w/5replicas/c11n"
-	PLOT_PREFIX = "boxplots"
+	PLOT_PREFIX = "../boxplots"
 )
 
 func main() {
@@ -68,10 +68,18 @@ func run() error {
 	fmt.Println("========== GKE vs C11n ==========")
 	fmt.Print(getDifference(gkeRun, c11nRun))
 
-	plotData(aksRun.MeanRaw, gkeRun.MeanRaw, c11nRun.MeanRaw, "Mean latency", "mean")
-	plotData(aksRun.P99Raw, gkeRun.P99Raw, c11nRun.P99Raw, "P99 latency", "p99")
-	plotData(aksRun.MaxRaw, gkeRun.MaxRaw, c11nRun.MaxRaw, "Max latency", "max")
-	plotData(aksRun.MinRaw, gkeRun.MinRaw, c11nRun.MinRaw, "Min latency", "min")
+	if err := plotData(aksRun.MeanRaw, gkeRun.MeanRaw, c11nRun.MeanRaw, "Mean", "mean"); err != nil {
+		return fmt.Errorf("plotting mean: %w", err)
+	}
+	if err := plotData(aksRun.P99Raw, gkeRun.P99Raw, c11nRun.P99Raw, "99th Percentile", "p99"); err != nil {
+		return fmt.Errorf("plotting p99: %w", err)
+	}
+	if err := plotData(aksRun.MaxRaw, gkeRun.MaxRaw, c11nRun.MaxRaw, "Maximum", "max"); err != nil {
+		return fmt.Errorf("plotting max: %w", err)
+	}
+	if err := plotData(aksRun.MinRaw, gkeRun.MinRaw, c11nRun.MinRaw, "Minimum", "min"); err != nil {
+		return fmt.Errorf("plotting min: %w", err)
+	}
 
 	return nil
 }
